@@ -1,26 +1,26 @@
 # 🕷️ Divar Scraper
 
-اسکرپر async برای استخراج اطلاعات آگهی‌های [دیوار](https://divar.ir) — عنوان، شماره تماس و تمام تصاویر هر آگهی — با خروجی مرتب در CSV، گزارش متنی و پوشه‌بندی تصاویر.
+An async scraper for extracting listing information from [Divar](https://divar.ir) — title, phone number, and all images for each listing — with clean output in CSV, a text report, and organized image folders.
 
 ---
 
-## ✨ قابلیت‌ها
+## ✨ Features
 
-- استخراج **عنوان** آگهی
-- دریافت **شماره تماس** با کلیک خودکار روی دکمه «نمایش شماره»
-- دانلود تا **۸ تصویر** از هر آگهی — مستقیم از DOM، **بدون کلیک روی carousel**
-- ذخیره خروجی در **CSV** و **گزارش متنی**
-- پوشه‌بندی تصاویر به صورت `images/ad_001/image_01.jpg`
-- پشتیبانی از **session احراز هویت** دیوار (برای دسترسی به شماره‌ها)
-- مدیریت خطا: اگر یک آگهی خطا داد، بقیه ادامه پیدا می‌کنند
+- Extracts the **title** of each listing
+- Retrieves the **phone number** by automatically clicking the "Show Number" button
+- Downloads up to **8 images** per listing — directly from the DOM, **without clicking the carousel**
+- Saves output as a **CSV** file and a **text report**
+- Organizes images into folders: `images/ad_001/image_01.jpg`
+- Supports Divar **authentication sessions** (required to access phone numbers)
+- Error handling: if one listing fails, the rest continue processing
 
 ---
 
-## 📋 پیش‌نیازها
+## 📋 Prerequisites
 
 - Python 3.10+
-- Google Chrome نصب‌شده روی سیستم
-- کتابخانه‌های زیر:
+- Google Chrome installed on your system
+- The following libraries:
 
 ```bash
 pip install playwright aiohttp aiofiles
@@ -29,11 +29,11 @@ playwright install chromium
 
 ---
 
-## 🚀 نحوه استفاده
+## 🚀 How to Use
 
-### ۱. لینک‌های آگهی را وارد کنید
+### 1. Enter Your Listing Links
 
-فایل `divar_scraper.py` را باز کنید و لینک‌های مورد نظر را در لیست `MY_AD_LINKS` قرار دهید:
+Open `divar_scraper.py` and add your target listing URLs to the `MY_AD_LINKS` list:
 
 ```python
 MY_AD_LINKS = [
@@ -43,7 +43,7 @@ MY_AD_LINKS = [
 ]
 ```
 
-### ۲. اسکرپر را اجرا کنید
+### 2. Run the Scraper
 
 ```bash
 python divar_scraper.py
@@ -51,12 +51,12 @@ python divar_scraper.py
 
 ---
 
-## 🔐 احراز هویت (برای دریافت شماره تماس)
+## 🔐 Authentication (Required for Phone Numbers)
 
-دیوار برای نمایش شماره تماس نیاز به لاگین دارد. برای ذخیره session:
+Divar requires a login to display phone numbers. To save your session:
 
 ```python
-# save_auth.py — یک‌بار اجرا کنید
+# save_auth.py — run this once
 import asyncio
 from playwright.async_api import async_playwright
 
@@ -69,7 +69,7 @@ async def save():
         context = await browser.new_context()
         page = await context.new_page()
         await page.goto("https://divar.ir")
-        input("در مرورگر لاگین کنید، سپس Enter بزنید...")
+        input("Log in via the browser, then press Enter...")
         await context.storage_state(path="divar_auth.json")
         await browser.close()
         print("✅ Session saved to divar_auth.json")
@@ -77,18 +77,18 @@ async def save():
 asyncio.run(save())
 ```
 
-بعد از ذخیره `divar_auth.json` در کنار اسکرپر، شماره‌ها به صورت خودکار دریافت می‌شوند.
+After saving `divar_auth.json` in the same directory as the scraper, phone numbers will be retrieved automatically.
 
-> اگر فایل `divar_auth.json` وجود نداشته باشد، اسکرپر بدون خطا اجرا می‌شود — فقط شماره‌ها نمایش داده نمی‌شوند.
+> If `divar_auth.json` does not exist, the scraper will still run without errors — phone numbers simply won't be shown.
 
 ---
 
-## 📁 ساختار خروجی
+## 📁 Output Structure
 
 ```
 project/
 ├── divar_scraper.py
-├── divar_auth.json        ← session احراز هویت (اختیاری)
+├── divar_auth.json        ← authentication session (optional)
 │
 ├── images/
 │   ├── ad_001/
@@ -99,17 +99,17 @@ project/
 │   │   └── image_01.jpg
 │   └── ...
 │
-├── divar_ads.csv          ← خروجی CSV
-└── ads_report.txt         ← گزارش متنی
+├── divar_ads.csv          ← CSV output
+└── ads_report.txt         ← text report
 ```
 
-### نمونه خروجی CSV
+### Sample CSV Output
 
 | title | phone | link | image_count | image_files |
 |-------|-------|------|-------------|-------------|
-| آپارتمان ۸۰ متری | 09121234567 | https://divar.ir/v/... | 3 | ad_001/image_01.jpg \| ad_001/image_02.jpg |
+| 80m² Apartment | 09121234567 | https://divar.ir/v/... | 3 | ad_001/image_01.jpg \| ad_001/image_02.jpg |
 
-### نمونه گزارش متنی (`ads_report.txt`)
+### Sample Text Report (`ads_report.txt`)
 
 ```
 ================================================================================
@@ -117,7 +117,7 @@ project/
 ================================================================================
 
 Ad #1
-  Title      : آپارتمان ۸۰ متری در تهران
+  Title      : 80m² Apartment in Tehran
   Phone      : 09121234567
   Link       : https://divar.ir/v/xxxxxxxx
   Images     : 3
@@ -127,23 +127,23 @@ Ad #1
 
 ---
 
-## ⚙️ تنظیمات
+## ⚙️ Configuration
 
-در ابتدای فایل `divar_scraper.py`:
+At the top of `divar_scraper.py`:
 
-| متغیر | پیش‌فرض | توضیح |
-|-------|---------|-------|
-| `MY_AD_LINKS` | `[]` | لیست لینک‌های آگهی |
-| `MAX_IMAGES` | `8` | حداکثر تعداد تصویر به ازای هر آگهی |
-| `executable_path` | مسیر Chrome | مسیر Chrome روی سیستم شما |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MY_AD_LINKS` | `[]` | List of listing URLs |
+| `MAX_IMAGES` | `8` | Maximum number of images per listing |
+| `executable_path` | Chrome path | Path to Chrome on your system |
 
 ---
 
-## 🔬 جزئیات فنی
+## 🔬 Technical Details
 
-### چرا روی thumbnail کلیک نمی‌کنیم؟
+### Why don't we click on thumbnails?
 
-دیوار با کلیک روی thumbnail دکمه‌های carousel، یک **fullscreen viewer** باز می‌کند که flow اسکرپر را خراب می‌کند. راه‌حل: دیوار تمام تصاویر را **همزمان در DOM** نگه می‌دارد:
+Clicking carousel thumbnail buttons on Divar opens a **fullscreen viewer** that disrupts the scraper's flow. The solution: Divar keeps all images **loaded in the DOM simultaneously**:
 
 ```html
 <div class="kt-base-carousel__slide">
@@ -154,36 +154,32 @@ Ad #1
 </div>
 ```
 
-اسکرپر مستقیم `src` و `srcset` همه slide ها را از DOM می‌خواند — بدون هیچ interaction.
+The scraper reads the `src` and `srcset` attributes directly from all slides in the DOM — no interaction needed.
 
-### ترتیب اولویت استخراج تصویر
+### Image Extraction Priority
 
 ```
-1️⃣  img داخل  .kt-base-carousel__slide        ← روش اصلی
-2️⃣  source > picture  داخل carousel           ← اگر img خالی بود
-3️⃣  هر img با URL دیوار در صفحه               ← fallback نهایی
+1️⃣  img inside  .kt-base-carousel__slide        ← primary method
+2️⃣  source > picture  inside the carousel       ← if img is empty
+3️⃣  any img with a Divar URL on the page        ← final fallback
 ```
 
 ---
 
-## ⚠️ نکات مهم
+## ⚠️ Important Notes
 
-- این ابزار برای **استفاده شخصی** طراحی شده است.
-- بین هر آگهی **۳ ثانیه تأخیر** وجود دارد تا فشار روی سرور دیوار کم باشد.
-- استفاده تجاری یا scraping انبوه ممکن است با **شرایط استفاده دیوار** مغایرت داشته باشد.
-
----
-
-## 🛠️ وابستگی‌ها
-
-| کتابخانه | نقش |
-|----------|-----|
-| `playwright` | کنترل مرورگر و رندر صفحه |
-| `aiohttp` | دانلود async تصاویر |
-| `aiofiles` | نوشتن async فایل |
+- This tool is designed for **personal use**.
+- There is a **3-second delay** between each listing to reduce load on Divar's servers.
+- Commercial use or bulk scraping may violate **Divar's Terms of Service**.
 
 ---
 
-## 📄 لایسنس
+## 🛠️ Dependencies
 
-MIT
+| Library | Role |
+|---------|------|
+| `playwright` | Browser control and page rendering |
+| `aiohttp` | Async image downloading |
+| `aiofiles` | Async file writing |
+
+---
